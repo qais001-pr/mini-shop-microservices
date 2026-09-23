@@ -5,7 +5,6 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
-// import ShowProducts from "./pages/ShowProducts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,7 +14,7 @@ function App() {
       <Routes>
 
         {/* Public Route */}
-        <Route path="/" element={<Login />} />
+        <Route path="/admin" element={<Login />} />
 
         {/* Protected Routes */}
         <Route

@@ -16,9 +16,6 @@ services:
 
     networks:
       - minishop-network
-
-    depends_on:
-      - kafka
   user:
     build:
       context: ./user
@@ -34,9 +31,6 @@ services:
 
     networks:
       - minishop-network
-
-    depends_on:
-      - kafka
   user_service:
     build:
       context: ./services/user-service
@@ -53,9 +47,6 @@ services:
     networks:
       - minishop-network
 
-    depends_on:
-      - kafka
-
   product_service:
     build:
       context: ./services/product-service
@@ -71,48 +62,7 @@ services:
 
     networks:
       - minishop-network
-
-    depends_on:
-      - kafka
-
-  notification_service:
-    build:
-      context: ./services/notification-service
-      dockerfile: Dockerfile
-
-    container_name: minishop-notification-service
-
-    env_file:
-      - ./services/notification-service/.env
-
-    ports:
-      - "3003:3003"
-
-    networks:
-      - minishop-network
-
-    depends_on:
-      - kafka
-
-  kafka:
-    image: apache/kafka:4.0.0
-
-    container_name: kafka
-
-    hostname: kafka
-
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-
-    env_file:
-      - ./services/kafka/.env
-    volumes:
-      - kafka-data:/var/lib/kafka/data
-
-    networks:
-      - minishop-network
-
+      
 volumes:
   kafka-data:
 
