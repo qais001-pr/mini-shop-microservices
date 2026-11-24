@@ -16,7 +16,7 @@ const handleLogin = async (e) => {
     try {
 
         const response = await fetch(
-            `${process.env.REACT_APP_API_URL}login`,
+            `/api/admin/login`,
             {
                 method: "POST",
 

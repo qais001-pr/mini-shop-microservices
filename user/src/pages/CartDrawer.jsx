@@ -11,10 +11,7 @@ import {
   selectCartTotal,
 } from "../features/cart/cartSlice";
 import "./CartDrawer.css";
-
-// Same image-base convention as ShowProducts.jsx — change if your backend
-// serves uploads from a different path.
-const IMAGE_BASE_URL = "http://localhost:3002/uploads/";
+const IMAGE_BASE_URL = "";
 
 function resolveImage(raw) {
   if (!raw) return null;

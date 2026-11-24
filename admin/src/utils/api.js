@@ -1,11 +1,8 @@
 // src/utils/api.js
 import axios from "axios";
 
-const ADMIN_API_URL =
-  process.env.REACT_APP_API_URL || "/api/admin/";
-const PRODUCT_API_URL =
-  process.env.REACT_APP_API_URL_PRODUCT ||
-  "/api/products/";
+const ADMIN_API_URL = "/api/admin/";
+const PRODUCT_API_URL = "/api/products/";
 
 function createInstance(baseURL) {
   const instance = axios.create({ baseURL });

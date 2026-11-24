@@ -6,15 +6,7 @@ import { fetchProducts } from "../features/products/productSlice";
 import { addItem, toggleCart, selectCartCount } from "../features/cart/cartSlice";
 import CartDrawer from "./CartDrawer";
 import "./ShowProducts.css";
-
-// This app runs separately from the admin app, so "Admin Login" has to be a
-// full URL, not a relative route. Point this at wherever your admin app is
-// actually served.
-const ADMIN_APP_URL = "http://localhost:3000/login";
-
-// If your backend serves uploaded images from a different path/port,
-// change this one line.
-const IMAGE_BASE_URL = "http://localhost:3002/uploads/";
+const IMAGE_BASE_URL = "";
 
 function resolveImage(product) {
   const raw =

@@ -1,49 +1,23 @@
-name: minishop-microservice-e-commerce-system
+name: microservices
 
 services:
   admin:
     build:
       context: ./admin
       dockerfile: Dockerfile
-
-    container_name: minishop-admin-panel
-
-    env_file:
-      - ./admin/.env
-
+    container_name: admin-panel
     ports:
-      - "3000:3000"
-
+      - "3000:80"
     networks:
       - minishop-network
+      
   user:
     build:
       context: ./user
       dockerfile: Dockerfile
-
-    container_name: minishop-user-panel
-
-    env_file:
-      - ./user/.env
-
+    container_name: user-panel
     ports:
-      - "3010:3000"
-
-    networks:
-      - minishop-network
-  user_service:
-    build:
-      context: ./services/user-service
-      dockerfile: Dockerfile
-
-    container_name: minishop-user-service
-
-    env_file:
-      - ./services/user-service/.env
-
-    ports:
-      - "3001:3001"
-
+      - "3010:80"
     networks:
       - minishop-network
 
@@ -51,21 +25,24 @@ services:
     build:
       context: ./services/product-service
       dockerfile: Dockerfile
-
-    container_name: minishop-product-service
-
+    container_name: product-service
     env_file:
       - ./services/product-service/.env
-
     ports:
       - "3002:3002"
-
     networks:
       - minishop-network
-      
-volumes:
-  kafka-data:
-
+  user_service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    env_file:
+      - ./services/user-service/.env
+    ports:
+      - "3001:3001"
+    networks:
+      - minishop-network
 networks:
   minishop-network:
     driver: bridge

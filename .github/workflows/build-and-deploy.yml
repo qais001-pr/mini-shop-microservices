@@ -1,153 +1,153 @@
 
-name: Build and Push MiniShop Images to Docker Hub
+# name: Build and Push MiniShop Images to Docker Hub
 
-on:
-  push:
-    tags:
-      - "v*"
+# on:
+#   push:
+#     tags:
+#       - "v*"
 
-jobs:
+# jobs:
 
-  build-and-push:
-    name: Build and Push ${{ matrix.service.name }}
-    runs-on: ubuntu-latest
+#   build-and-push:
+#     name: Build and Push ${{ matrix.service.name }}
+#     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: true
+#     strategy:
+#       fail-fast: true
 
-      matrix:
-        service:
-          - name: admin-panel
-            context: ./admin
-            dockerfile: ./admin/Dockerfile.k8s
-            image: minishop_admin
-            frontend: true
-            user: false
+#       matrix:
+#         service:
+#           - name: admin-panel
+#             context: ./admin
+#             dockerfile: ./admin/Dockerfile.k8s
+#             image: minishop_admin
+#             frontend: true
+#             user: false
 
-          - name: user
-            context: ./user
-            dockerfile: ./user/Dockerfile.k8s
-            image: minishop_user
-            frontend: true
-            user: true
+#           - name: user
+#             context: ./user
+#             dockerfile: ./user/Dockerfile.k8s
+#             image: minishop_user
+#             frontend: true
+#             user: true
 
-          - name: user-service
-            context: ./services/user-service
-            dockerfile: ./services/user-service/Dockerfile
-            image: minishop_user_service
-            frontend: false
-            user: false
+#           - name: user-service
+#             context: ./services/user-service
+#             dockerfile: ./services/user-service/Dockerfile
+#             image: minishop_user_service
+#             frontend: false
+#             user: false
 
-          - name: product-service
-            context: ./services/product-service
-            dockerfile: ./services/product-service/Dockerfile
-            image: minishop_product_service
-            frontend: false
-            user: false
+#           - name: product-service
+#             context: ./services/product-service
+#             dockerfile: ./services/product-service/Dockerfile
+#             image: minishop_product_service
+#             frontend: false
+#             user: false
 
-    steps:
+#     steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+#       - name: Setup Docker Buildx
+#         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: Login to Docker Hub
+#         uses: docker/login-action@v3
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.dockerfile }}
+#       - name: Build and Push Docker Image
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: ${{ matrix.service.context }}
+#           file: ${{ matrix.service.dockerfile }}
 
-          push: true
+#           push: true
 
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.image }}:${{ github.ref_name }}
+#           tags: |
+#             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.image }}:${{ github.ref_name }}
 
-          build-args: |
-            REACT_APP_API_URL=${{ matrix.service.frontend && vars.REACT_APP_API_URL || '' }}
-            REACT_APP_API_URL_PRODUCT=${{ (matrix.service.frontend || matrix.service.user) && vars.REACT_APP_API_URL_PRODUCT || '' }}
+#           build-args: |
+#             REACT_APP_API_URL=${{ matrix.service.frontend && vars.REACT_APP_API_URL || '' }}
+#             REACT_APP_API_URL_PRODUCT=${{ (matrix.service.frontend || matrix.service.user) && vars.REACT_APP_API_URL_PRODUCT || '' }}
 
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
 
-  deployment:
-    name: Package Helm Chart and Update Deployment
-    needs: build-and-push
-    runs-on: ubuntu-latest
+#   deployment:
+#     name: Package Helm Chart and Update Deployment
+#     needs: build-and-push
+#     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+#     permissions:
+#       contents: read
+#       packages: write
 
-    steps:
+#     steps:
 
-      - name: Checkout application repository
-        uses: actions/checkout@v4
+#       - name: Checkout application repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Helm
-        uses: azure/setup-helm@v4
+#       - name: Setup Helm
+#         uses: azure/setup-helm@v4
 
-      - name: Install yq
-        uses: mikefarah/yq@v4
+#       - name: Install yq
+#         uses: mikefarah/yq@v4
 
-      - name: Checkout deployment repository
-        uses: actions/checkout@v4
-        with:
-          repository: qais001-pr/mini-shop-microservices-deployment
-          ref: main
-          token: ${{ secrets.TOKEN_LOGIN_GITHUB }}
-          path: mini-shop-microservices-deployment
+#       - name: Checkout deployment repository
+#         uses: actions/checkout@v4
+#         with:
+#           repository: qais001-pr/mini-shop-microservices-deployment
+#           ref: main
+#           token: ${{ secrets.TOKEN_LOGIN_GITHUB }}
+#           path: mini-shop-microservices-deployment
 
-      - name: Update image tags
-        working-directory: mini-shop-microservices-deployment/helm
-        env:
-          IMAGE_TAG: ${{ github.ref_name }}
-        run: |
-          yq -i '.admin.image.tag = env(IMAGE_TAG)' values.yaml
-          yq -i '.userpanel.image.tag = env(IMAGE_TAG)' values.yaml
-          yq -i '.userservice.image.tag = env(IMAGE_TAG)' values.yaml
-          yq -i '.productservice.image.tag = env(IMAGE_TAG)' values.yaml
+#       - name: Update image tags
+#         working-directory: mini-shop-microservices-deployment/helm
+#         env:
+#           IMAGE_TAG: ${{ github.ref_name }}
+#         run: |
+#           yq -i '.admin.image.tag = env(IMAGE_TAG)' values.yaml
+#           yq -i '.userpanel.image.tag = env(IMAGE_TAG)' values.yaml
+#           yq -i '.userservice.image.tag = env(IMAGE_TAG)' values.yaml
+#           yq -i '.productservice.image.tag = env(IMAGE_TAG)' values.yaml
 
-      - name: Helm lint
-        working-directory: mini-shop-microservices-deployment/helm
-        run: |
-          helm lint .
+#       - name: Helm lint
+#         working-directory: mini-shop-microservices-deployment/helm
+#         run: |
+#           helm lint .
 
-      - name: Package Helm Chart
-        working-directory: mini-shop-microservices-deployment/helm
-        run: |
-          helm package .
+#       - name: Package Helm Chart
+#         working-directory: mini-shop-microservices-deployment/helm
+#         run: |
+#           helm package .
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: qais001-pr
-          password: ${{ secrets.TOKEN_LOGIN_GITHUB }}
+#       - name: Login to GitHub Container Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ghcr.io
+#           username: qais001-pr
+#           password: ${{ secrets.TOKEN_LOGIN_GITHUB }}
 
-      - name: Push Helm Chart to GHCR
-        working-directory: mini-shop-microservices-deployment/helm
-        run: |
-          helm push *.tgz oci://ghcr.io/qais001-pr
+#       - name: Push Helm Chart to GHCR
+#         working-directory: mini-shop-microservices-deployment/helm
+#         run: |
+#           helm push *.tgz oci://ghcr.io/qais001-pr
 
-      - name: Commit deployment changes
-        working-directory: mini-shop-microservices-deployment
-        run: |
-          git config user.name "Muhammad Qais"
-          git config user.email "qaismuhammad742@gmail.com"
+#       - name: Commit deployment changes
+#         working-directory: mini-shop-microservices-deployment
+#         run: |
+#           git config user.name "Muhammad Qais"
+#           git config user.email "qaismuhammad742@gmail.com"
 
-          git add helm/values.yaml
+#           git add helm/values.yaml
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "chore: update service images and helm chart version"
-            git push origin main
-          fi
+#           if git diff --cached --quiet; then
+#             echo "No changes to commit."
+#           else
+#             git commit -m "chore: update service images and helm chart version"
+#             git push origin main
+#           fi
