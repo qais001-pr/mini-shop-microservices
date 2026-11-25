@@ -21,7 +21,7 @@ services:
     networks:
       - minishop-network
 
-  product_service:
+  productservice:
     build:
       context: ./services/product-service
       dockerfile: Dockerfile
@@ -32,7 +32,7 @@ services:
       - "3002:3002"
     networks:
       - minishop-network
-  user_service:
+  userservice:
     build:
       context: ./services/user-service
       dockerfile: Dockerfile
